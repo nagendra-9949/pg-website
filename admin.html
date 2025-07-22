@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - View Bookings</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+        }
+        .admin-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .admin-table th, .admin-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .admin-table th {
+            background: #1a365d;
+            color: white;
+        }
+        .admin-table tr:hover {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Admin - View Bookings</h1>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Aadhar</th>
+                    <th>Room Type</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                    <th>Aadhar Doc</th>
+                </tr>
+            </thead>
+            <tbody id="bookingsTableBody">
+                <!-- Bookings will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        function logout() {
+            // This is a simple logout, you might want a more secure implementation
+            window.location.href = 'login.html';
+        }
+        function loadBookings() {
+            fetch('http://localhost:8080/api/bookings')
+                .then(res => res.json())
+                .then(bookings => {
+                    const tableBody = document.getElementById('bookingsTableBody');
+                    tableBody.innerHTML = '';
+                    if (bookings.length === 0) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = '<td colspan="8" style="text-align:center;">No bookings found.</td>';
+                        tableBody.appendChild(row);
+                        return;
+                    }
+                    bookings.forEach(booking => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${booking.id}</td>
+                            <td>${booking.name}</td>
+                            <td>${booking.email}</td>
+                            <td>${booking.phone}</td>
+                            <td>${booking.aadhar}</td>
+                            <td>${booking.roomType}</td>
+                            <td>${booking.message}</td>
+                            <td>${booking.date}</td>
+                            <td>${booking.docPath ? `<a href="${booking.docPath}" target="_blank">View</a>` : 'N/A'}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(() => {
+                    const tableBody = document.getElementById('bookingsTableBody');
+                    tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red;">Error loading bookings.</td></tr>';
+                });
+        }
+        window.onload = function() {
+            loadBookings();
+        };
+    </script>
+</body>
+</html> 
